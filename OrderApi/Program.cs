@@ -1,36 +1,43 @@
+using MediatR;
+using OrderApi.Application.Commands;
+using OrderApi.Application.Queries;
+using OrderApi.DTOs;
+using OrderApi.Infrastructure;
+using OrderApi.Mapping;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddControllers();
+builder.Services.AddAutoMapper(typeof(OrderMappingProfile));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CreateOrderCommand>());
+builder.Services.AddSingleton<SqlConnectionFactory>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 var app = builder.Build();
+app.MapControllers();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) app.MapOpenApi();
-
-var summaries = new[]
+// Add minimal API endpoint here
+app.MapPost("/orders", async (
+    CreateOrderDto dto,
+    IMediator mediator,
+    ILogger<Program> logger) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    logger.LogInformation("Received new order from {Customer}", dto.CustomerName);
 
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
+    var command = new CreateOrderCommand { Dto = dto };
+    var response = await mediator.Send(command);
+
+    logger.LogInformation("Order {OrderId} created successfully", response.Id);
+    return Results.Created($"/orders/{response.Id}", response);
+});
+app.MapGet("/orders", async (IMediator mediator, ILogger<Program> logger) =>
+{
+    logger.LogInformation("Fetching all orders");
+
+    var result = (await mediator.Send(new GetAllOrdersQuery())).ToList();
+
+    logger.LogInformation("{OrdersCount} orders fetched successfully", result.Count);
+    return Results.Ok(result);
+});
 
 app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

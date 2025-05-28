@@ -1,0 +1,13 @@
+### Create Order
+POST http://localhost:5229/orders
+Content-Type: application/json
+
+{
+  "customerName": "John Doe",
+  "product": "GeForce RTX 4070 Ti Super",
+  "totalAmount": 1499.99
+}
+
+### Get All Orders
+GET http://localhost:5229/orders
+Accept: application/json

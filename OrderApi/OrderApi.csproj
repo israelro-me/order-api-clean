@@ -7,16 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="14.0.0" />
-        <PackageReference Include="Dapper" Version="2.1.66" />
-        <PackageReference Include="MediatR" Version="12.5.0" />
+        <PackageReference Include="AutoMapper" Version="14.0.0"/>
+        <PackageReference Include="Dapper" Version="2.1.66"/>
+        <PackageReference Include="Dapper.SimpleSqlBuilder" Version="4.2.3"/>
+        <PackageReference Include="Dapper.SqlBuilder" Version="2.1.66"/>
+        <PackageReference Include="MediatR" Version="12.5.0"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-preview.4.25258.110" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Application\Queries\" />
-      <Folder Include="Mapping\" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.0-preview1.25120.4"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-preview.4.25258.110"/>
     </ItemGroup>
 
 </Project>
